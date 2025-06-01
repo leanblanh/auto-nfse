@@ -7,7 +7,9 @@ class Cliente:
     nome: str
     cpf: Optional[str] = None
     email: Optional[str] = None
+    ddd: Optional[str] = None
     telefone: Optional[str] = None
+    cep: Optional[str] = None
     rua: Optional[str] = None
     bairro: Optional[str] = None
     cidade: Optional[str] = None

@@ -9,6 +9,7 @@ class ApiPrefituraAdapter:
 
     def emitir_nota_fiscal(self, nota_fiscal_data: dict) -> dict:
         headers = {"Authorization": f"Bearer {self.token}"}  # Ajuste conforme a autenticação da API
+        response = None
         try:
             response = requests.post(f"{self.url}/notas", json=nota_fiscal_data, headers=headers)
             response.raise_for_status()  # Lança exceção para status HTTP de erro

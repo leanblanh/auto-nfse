@@ -2,6 +2,18 @@ from .entities import Cliente, Venda, NotaFiscal
 from .exceptions import AddressNotFoundError, ApiPrefituraError, DDDNotFoundError, InvalidDataError
 from typing import Protocol
 
+CURSO_PARA_NOTA_MAP = {
+    "Oficina Moda Fitness Modelagem e Costura de Roupas Esportivas": "Curso EAD",
+    "Dayse Costa Academy MEMBROS": "Plano de Assinatura",
+    "Costura Básica Para Iniciantes -Faça Suas Roupas": "Curso EAD - Costura Básica",
+}
+
+def mapear_nome_curso(nome_na_planilha:str) -> str:
+    """
+    Mapeia o nome do curso para o nome utilizado na nota fiscal.
+    """
+    return CURSO_PARA_NOTA_MAP.get(nome_na_planilha, nome_na_planilha)
+
 class CepService(Protocol):
     def buscar_endereco(self, cep: str) -> dict:
         ...
@@ -49,6 +61,7 @@ class NotaFiscalService:
 
     def gerar_nota_fiscal(self, venda: Venda) -> NotaFiscal:
         venda.cliente = self._preencher_endereco(venda.cliente)
+        nome_curso_nota = mapear_nome_curso(venda.curso)
 
         nota_fiscal_data = {
             "cliente": {
@@ -65,7 +78,7 @@ class NotaFiscalService:
                     "complemento": venda.cliente.complemento
                 }
             },
-            "itens": [{"descricao": venda.curso, "valor": venda.valor}],
+            "itens": [{"descricao": nome_curso_nota, "valor": venda.valor}],
             "valor_total": venda.valor,
             "codigo_oferta": venda.codigo_oferta
         }
@@ -76,7 +89,7 @@ class NotaFiscalService:
             data_emissao = resposta_api["data_emissao"]
             return NotaFiscal(
                 cliente=venda.cliente,
-                itens=[venda.curso],
+                itens=[nome_curso_nota],
                 valor_total=venda.valor,
                 numero=numero_nota,
                 data_emissao=data_emissao
